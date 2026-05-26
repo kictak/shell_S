@@ -23,29 +23,34 @@
    ```powershell
    Install-Module Oh-My-Posh -Scope CurrentUser
    Install-Module Terminal-Icons -Scope CurrentUser
-Откройте свой профиль PowerShell (если файла нет, он создастся):
 
-powershell
-notepad $PROFILE
-Добавьте содержимое файла profile.ps1 из этого репозитория в открывшийся блокнот.
+2. Откройте свой профиль PowerShell (если файла нет, он создастся):
+   powershell
+   notepad $PROFILE
+   
+3. Добавьте содержимое файла profile.ps1 из этого репозитория в открывшийся блокнот.
 
-Внимание
-Найдите в коде строку $ompConfig = ".\shell_S.omp.json" и замените путь на тот, где лежит ваш файл shell_S.omp.json.
+## ВНИМАНИЕ
 
-Сохраните профиль (Ctrl+S) и закройте блокнот.
+-  Найдите в коде строку $ompConfig = ".\shell_S.omp.json" и замените путь на тот, где лежит ваш файл shell_S.omp.json.
 
-Перезапустите терминал.
+## ВНИМАНИЕ
 
-Дополнительно
-Отключение баннера PowerShell: запускайте pwsh.exe -NoLogo.
+4. Сохраните профиль (Ctrl+S) и закройте блокнот.
 
-Отключение встроенного замера времени профиля:
+5. Перезапустите терминал.
 
-powershell
-Disable-ExperimentalFeature -Name PSProfileLoadTime
-Если нужна анимация приветствия, используйте функцию с Start-Sleep (закомментирована в profile.ps1).
+## Дополнительно
 
-Файлы
-shell_S.omp.json – тема Oh My Posh.
+- Отключение баннера PowerShell: запускайте pwsh.exe -NoLogo.
 
-profile.ps1 – профиль PowerShell.
+- Отключение встроенного замера времени профиля:
+  powershell
+  Disable-ExperimentalFeature -Name PSProfileLoadTime
+  Если нужна анимация приветствия, используйте функцию с Start-Sleep (закомментирована в profile.ps1).
+
+## Файлы
+
+- shell_S.omp.json – тема Oh My Posh.
+
+- profile.ps1 – профиль PowerShell.
