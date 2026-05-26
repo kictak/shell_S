@@ -15,7 +15,7 @@
 
 - [PowerShell 7](https://github.com/PowerShell/PowerShell)
 - [Oh My Posh](https://ohmyposh.dev/docs/installation/windows)
-- [Terminal-Icons](https://github.com/devblackops/Terminal-Icons) 
+- [Terminal-Icons](https://github.com/devblackops/Terminal-Icons)
 
 ## Установка
 
@@ -23,11 +23,29 @@
    ```powershell
    Install-Module Oh-My-Posh -Scope CurrentUser
    Install-Module Terminal-Icons -Scope CurrentUser
+Откройте свой профиль PowerShell (если файла нет, он создастся):
 
-2. Добавьте содержимое файла `profile.ps1` из этого репозитория в ваш профиль PowerShell.  
+powershell
+notepad $PROFILE
+Добавьте содержимое файла profile.ps1 из этого репозитория в открывшийся блокнот.
 
-   > **Важно**  
-   > Найдите в скопированном коде строку  
-   > `$ompConfig = ".\atomicBit.omp.json"`  
-   > и убедитесь, что путь указывает на реальное расположение файла `shell_S.omp.json` на вашем компьютере.  
-   > Если вы сохранили тему в другую папку, **обязательно исправьте эту переменную** – иначе тема не загрузится.
+Внимание
+Найдите в коде строку $ompConfig = ".\shell_S.omp.json" и замените путь на тот, где лежит ваш файл shell_S.omp.json.
+
+Сохраните профиль (Ctrl+S) и закройте блокнот.
+
+Перезапустите терминал.
+
+Дополнительно
+Отключение баннера PowerShell: запускайте pwsh.exe -NoLogo.
+
+Отключение встроенного замера времени профиля:
+
+powershell
+Disable-ExperimentalFeature -Name PSProfileLoadTime
+Если нужна анимация приветствия, используйте функцию с Start-Sleep (закомментирована в profile.ps1).
+
+Файлы
+shell_S.omp.json – тема Oh My Posh.
+
+profile.ps1 – профиль PowerShell.
