@@ -1,0 +1,25 @@
+# atomicbit-posh
+
+![Запуск терминала](preview.gif)
+
+Минималистичная тема Oh My Posh и профиль PowerShell с градиентным приветствием при старте.
+
+## Особенности
+
+- Компактная тема Oh My Posh: имя пользователя, хост, текущий путь, Git-статус, время.
+- Градиентное приветствие при запуске (от чёрного к белому).
+- Набор полезных алиасов: `..`, `...`, `~`.
+- Оптимизированные настройки PSReadLine (история, предсказания, отключение звука).
+
+## Требования
+
+- [PowerShell 7](https://github.com/PowerShell/PowerShell)
+- [Oh My Posh](https://ohmyposh.dev/docs/installation/windows)
+- [Terminal-Icons](https://github.com/devblackops/Terminal-Icons) 
+
+## Установка
+
+1. Установите модули:
+   ```powershell
+   Install-Module Oh-My-Posh -Scope CurrentUser
+   Install-Module Terminal-Icons -Scope CurrentUser

@@ -1,0 +1,132 @@
+$ompConfig = "..\.\.\atomicBit.omp.json" 
+
+
+
+# Засекаем время загрузки профиля
+$profileLoadStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
+# ============================================
+# 1. PSReadLine
+# ============================================
+
+Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
+Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineOption -PredictionViewStyle ListView
+Set-PSReadLineOption -BellStyle None
+Set-PSReadLineOption -Colors @{ InlinePrediction = '#555555' }
+Set-PSReadLineOption -HistorySearchCursorMovesToEnd
+$MaximumHistoryCount = 10000
+
+# ============================================
+# 2. Terminal-Icons 
+# ============================================
+
+$function:ls = $function:dir = {
+    if (-not (Get-Module -ListAvailable Terminal-Icons)) {
+        return Get-ChildItem @args
+    }
+    Import-Module Terminal-Icons -ErrorAction SilentlyContinue
+    Remove-Item Function:\ls, Function:\dir -Force
+    Get-ChildItem @args
+}
+
+# ============================================
+# 3. Oh My Posh
+# ============================================
+
+if (Test-Path $ompConfig) {
+    $ompCache = "$env:TEMP\omp_prompt.ps1"
+    if (-not (Test-Path $ompCache) -or ((Get-Item $ompCache).LastWriteTime -lt (Get-Item $ompConfig).LastWriteTime)) {
+        oh-my-posh init pwsh --config $ompConfig | Out-File $ompCache -Encoding utf8
+    }
+    . $ompCache
+} else {
+    Write-Warning "OMP config missing: $ompConfig"
+}
+
+# ============================================
+# 4. Алиасы
+# ============================================
+function .. { Set-Location .. }
+function ... { Set-Location ../.. }
+function ~ { Set-Location ~ }
+
+# ============================================
+# 5. ASCII-арт — анимация «по столбцам» слева направо
+# ============================================
+$profileLoadStopwatch.Stop()
+$loadMs = $profileLoadStopwatch.ElapsedMilliseconds
+
+function Get-HeatGradientChar {
+    param([int]$X, [int]$LineLength)
+    $t = if ($LineLength -gt 1) { $X / ($LineLength - 1) } else { 0 }
+    
+    if ($t -lt 0.25) {
+        $localT = $t / 0.25
+        $r = [math]::Floor(139 * $localT)
+        $g = 0
+        $b = 0
+    }
+    elseif ($t -lt 0.50) {
+        $localT = ($t - 0.25) / 0.25
+        $r = 255
+        $g = [math]::Floor(69 * $localT)
+        $b = 0
+    }
+    elseif ($t -lt 0.75) {
+        $localT = ($t - 0.50) / 0.25
+        $r = 255
+        $g = [math]::Floor(69 + (186 * $localT))
+        $b = 0
+    }
+    else {
+        $localT = ($t - 0.75) / 0.25
+        $r = 255
+        $g = 255
+        $b = [math]::Floor(255 * $localT)
+    }
+    
+    return @{
+        Char = $null
+        Ansi = "38;2;$r;$g;$b"
+    }
+}
+
+$hourglassLines = @(
+    "     .-.     ",
+    "    /   \         .-.     ",
+    "   /     \       /   \       .-.     .-.     _   _",
+    "+--/-------\-----/-----\-----/---\---/---\---/-\-/-\/\/---> $loadMs ms",
+    "| /         \   /       \   /     '-'     '-'",
+    "|/           '-'         '-'",
+    "|",
+    "|"
+)
+
+# Определяем максимальную длину строки
+$maxLength = ($hourglassLines | ForEach-Object { $_.Length } | Measure-Object -Maximum).Maximum
+
+# Создаём массив строк, дополненных пробелами до одинаковой длины
+$paddedLines = $hourglassLines | ForEach-Object {
+    $_.PadRight($maxLength)
+}
+
+# Вывод по столбцам: для каждой позиции x печатаем символы из всех строк с соответствующим цветом
+for ($x = 0; $x -lt $maxLength; $x++) {
+    # Возвращаем курсор в начало области (можно просто переписать строки, но проще очистить экран и перерисовать)
+    # Вместо перемещения курсора будем собирать очередной "снимок" и выводить поверх старого, используя Clear-Host или возврат каретки.
+    # Простой способ: сохраняем текущий снимок в массиве строк и перерисовываем.
+    Clear-Host
+    for ($y = 0; $y -lt $paddedLines.Count; $y++) {
+        $line = $paddedLines[$y]
+        $outputLine = ""
+        for ($i = 0; $i -le $x; $i++) {
+            if ($i -lt $line.Length) {
+                $info = Get-HeatGradientChar -X $i -LineLength $line.TrimEnd().Length  # используем длину без пробелов для цвета
+                $outputLine += "`e[$($info.Ansi)m$($line[$i])`e[0m"
+            }
+        }
+        Write-Host $outputLine
+    }
+    Start-Sleep -Milliseconds 30   # скорость появления
+}
