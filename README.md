@@ -1,4 +1,4 @@
-# atomicbit-posh
+# shell_S
 
 ![Запуск терминала](start.gif)
 
