@@ -1,4 +1,4 @@
-$ompConfig = "..\.\.\atomicBit.omp.json" 
+$ompConfig = ".\atomicBit.omp.json" 
 
 
 
