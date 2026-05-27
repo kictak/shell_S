@@ -13,6 +13,9 @@
         {
           "foreground": "#ff5555",
           "style": "plain",
+          "properties": {
+            "style": "agnoster_short"
+          },
           "template": "<#ffffff>[</>{{ .Path }}<#ffffff>]",
           "type": "path"
         },
@@ -59,7 +62,7 @@
         {
           "foreground": "#ecf7fa",
           "style": "plain",
-          "template": "\ue285",
+          "template": "{{ if gt .Code 0 }}✖ {{ .Code }}{{ else }}❯{{ end }}",
           "type": "status"
         }
       ],

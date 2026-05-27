@@ -1,24 +1,33 @@
 # shell_S
 
 ![Запуск терминала](start1.gif)
+![VS Code терминал](vs_code.png)
 
-Минималистичная тема Oh My Posh и профиль PowerShell с анимированным запуском и зву ковым эффектом.
+Минималистичная тема Oh My Posh и профиль PowerShell с анимированным запуском, градиентом и звуковым эффектом.
 
 ---
 
-## Особенности
+## Возможности
 
-- Минималистичный профиль для PowerShell
-- Oh My Posh тема: пользователь, хост, путь, Git-статус, время
-- Анимированное приветствие при запуске
-- Плавный градиент от тёмного к светлому
-- Пропуск анимации пробелом
-- Опциональный звук запуска (`startup.wav`)
-- Удобные алиасы: `..`, `...`, `~`
-- Настроенный PSReadLine:
-  - история команд
-  - подсказки
-  - отключение системного звука
+- минималистичный PowerShell-профиль
+- тема Oh My Posh:
+  - пользователь
+  - хост
+  - короткий путь
+  - Git-статус
+  - время справа
+- анимированное приветствие при запуске
+- плавный heat-gradient
+- пропуск анимации клавишей **Space**
+- звук запуска (`startup.wav`)
+- безопасная остановка звука при закрытии pwsh
+- автоматический поиск файлов рядом с `PROFILE`
+- кэширование Oh My Posh для быстрого старта
+- ленивая загрузка `Terminal-Icons`
+- удобные алиасы:
+  - `..`
+  - `...`
+  - `~`
 
 ---
 
@@ -32,118 +41,157 @@
 
 ---
 
-## Установка
+# Быстрая установка (рекомендуется)
 
-### 1. Установите модули
+### 1. Клонируйте репозиторий
 
 ```powershell
-Install-Module Oh-My-Posh -Scope CurrentUser
-Install-Module Terminal-Icons -Scope CurrentUser
+git clone https://github.com/kictak/shell_S.git
 ```
 
 ---
 
-### 2. Откройте профиль PowerShell
+### 2. Перейдите в папку
+
+```powershell
+cd shell_S
+```
+
+---
+
+### 3. Откройте профиль PowerShell
 
 ```powershell
 notepad $PROFILE
 ```
 
-Если файла нет — PowerShell создаст его автоматически.
+Если файла нет — PowerShell создаст его.
 
 ---
 
-### 3. Добавьте `profile.ps1`
+### 4. Скопируйте содержимое `PROFILE`
 
-Скопируйте содержимое файла `profile.ps1` из репозитория в открывшийся профиль.
-
----
-
-### 4. Укажите путь к теме
-
-> [!WARNING]
-> Найдите строку:
+Откройте файл:
 
 ```powershell
-$ompConfig = ".\shell_S.omp.json"
+notepad .\PROFILE
 ```
 
-и замените путь на свой.
+Скопируйте всё содержимое и вставьте в `$PROFILE`.
 
-Пример:
+---
+
+### 5. Положите файлы рядом с профилем
+
+Откройте папку профиля:
 
 ```powershell
-$ompConfig = "C:\Users\Name\Documents\PowerShell\shell_S\shell_S.omp.json"
+explorer (Split-Path $PROFILE)
 ```
 
----
+Скопируйте туда:
 
-### 5. Сохраните и перезапустите терминал
+```text
+PROFILE
+shell_S.omp.json
+startup.wav
+```
 
----
+Итог:
 
-## Пропуск анимации
-
-Во время запуска нажмите **Space**.
-
-Оставшаяся часть приветствия отобразится мгновенно.
-
----
-
-## Звук запуска
-
-По умолчанию профиль ищет:
-
-```powershell
-.\startup.wav
+```text
+Documents\PowerShell\
+├─ PROFILE
+├─ shell_S.omp.json
+└─ startup.wav
 ```
 
 ---
 
-### Добавить свой звук
+### 6. Перезапустите PowerShell
+
+или выполните:
+
+```powershell
+. $PROFILE
+```
+
+Готово.
+
+---
+
+# Как это работает
+
+Профиль автоматически ищет файлы рядом с собой:
+
+```powershell
+$ompConfig = Join-Path $PSScriptRoot "shell_S.omp.json"
+$soundPath = Join-Path $PSScriptRoot "startup.wav"
+```
+
+Это значит:
+
+- можно открывать терминал из любой папки
+- тема всегда найдётся
+- звук всегда найдётся
+
+Без ручной правки путей.
+
+---
+
+# Пропуск анимации
+
+Во время запуска нажмите:
+
+```text
+Space
+```
+
+Оставшаяся часть баннера появится мгновенно.
+
+---
+
+# Звук запуска
+
+По умолчанию используется:
+
+```text
+startup.wav
+```
+
+рядом с `PROFILE`.
+
+---
+
+## Добавить свой звук
 
 Поддерживается PCM WAV.
 
-Конвертация через ffmpeg:
+Конвертация:
 
 ```powershell
-ffmpeg -i "your-sound.mp3" -acodec pcm_s16le -ar 44100 "startup.wav"
+ffmpeg -i "my.mp3" -acodec pcm_s16le -ar 44100 "startup.wav"
 ```
 
-После этого положите файл рядом с профилем
-или укажите абсолютный путь.
-
-Пример:
-
-```powershell
-$soundPath = "C:\Users\Name\Music\startup.wav"
-```
+Положите файл рядом с профилем.
 
 ---
 
-### Отключить звук
+## Отключить звук
 
 Закомментируйте строку:
 
 ```powershell
-$soundPath = ".\startup.wav"
+$soundPath = Join-Path $PSScriptRoot "startup.wav"
 ```
 
 ---
 
-## Дополнительно
+# Дополнительно
 
-### Убрать баннер PowerShell
+## Убрать баннер PowerShell
 
-Запуск без логотипа:
-
-```powershell
-pwsh.exe -NoLogo
-```
-
-В Windows Terminal:
-
-Settings → PowerShell → commandline
+Windows Terminal → Settings → PowerShell → commandline
 
 ```powershell
 pwsh.exe -NoLogo
@@ -151,17 +199,9 @@ pwsh.exe -NoLogo
 
 ---
 
-### Отключить встроенный замер загрузки профиля
+## Скорость анимации
 
-```powershell
-Disable-ExperimentalFeature -Name PSProfileLoadTime
-```
-
----
-
-### Изменить скорость анимации
-
-В `profile.ps1` найдите:
+Найдите:
 
 ```powershell
 for ($w = 0; $w -lt 6000; $w++) { }
@@ -181,19 +221,31 @@ for ($w = 0; $w -lt 6000; $w++) { }
 
 Мгновенно:
 
-удалите строку полностью
+удалить строку.
 
 ---
 
-## Файлы
+## Обновить репозиторий
 
-| Файл | Описание |
+Если уже установлен:
+
+```powershell
+cd shell_S
+git pull
+```
+
+---
+
+# Файлы
+
+| Файл | Назначение |
 |---|---|
+| `PROFILE` | PowerShell профиль |
 | `shell_S.omp.json` | тема Oh My Posh |
-| `profile.ps1` | профиль PowerShell |
-| `start.gif` | демонстрация запуска |
-| `startup.wav` | звук запуска (опционально) |
+| `startup.wav` | звук запуска |
+| `start1.gif` | демонстрация |
+| `vs_code.png` | демонстрация vs_code|
 
 ---
 
-Сделано для PowerShell. 
+Сделано для PowerShell + Windows Terminal.
