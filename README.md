@@ -1,17 +1,16 @@
 # shell_S
 
+**shell_S** — минималистичная тема **Oh My Posh** для **PowerShell 7** с анимированным запуском, градиентом, звуком и отдельной настройкой для **VS Code**.
+
 ![Запуск терминала](start.gif)
 ![VS Code терминал](vs_code.png)
 
-# Минималистичная тема Oh My Posh и профиль PowerShell с анимированным запуском, градиентом и звуковым эффектом.
-
-
-# !!!Если вы будете редактировать код shell_S.omp.json убедитесь, что кодировка файла — UTF-8 без BOM.
+---
 
 ## Возможности
 
 - минималистичный PowerShell-профиль
-- тема Oh My Posh:
+- тема Oh My Posh с блоками:
   - пользователь
   - хост
   - короткий путь
@@ -20,9 +19,9 @@
 - анимированное приветствие при запуске
 - плавный heat-gradient
 - пропуск анимации клавишей **Space**
-- звук запуска (`startup.wav`)
-- безопасная остановка звука при закрытии pwsh
-- автоматический поиск файлов рядом с `PROFILE`
+- звук запуска `startup.wav`
+- безопасная остановка звука при закрытии PowerShell
+- автоматический поиск файлов рядом с профилем
 - кэширование Oh My Posh для быстрого старта
 - ленивая загрузка `Terminal-Icons`
 - удобные алиасы:
@@ -42,47 +41,48 @@
 
 ---
 
-# Быстрая установка (рекомендуется)
+## Структура проекта
 
-### 1. Клонируйте репозиторий
+```text
+shell_S/
+├─ PROFILE
+├─ Microsoft.VSCode_profile.ps1
+├─ shell_S.omp.json
+├─ startup.wav
+├─ start1.gif
+└─ vs_code.png
+```
+
+---
+
+## Установка
+
+### 1. Склонируйте репозиторий
 
 ```powershell
 git clone https://github.com/kictak/shell_S.git
-```
-
----
-
-### 2. Перейдите в папку
-
-```powershell
 cd shell_S
 ```
 
----
-
-### 3. Откройте профиль PowerShell
+### 2. Откройте основной профиль PowerShell
 
 ```powershell
 notepad $PROFILE
 ```
 
-Если файла нет — PowerShell создаст его.
+Если файл ещё не существует, PowerShell создаст его автоматически.
 
----
+### 3. Скопируйте содержимое файла `PROFILE`
 
-### 4. Скопируйте содержимое `PROFILE`
-
-Откройте файл:
+Откройте файл из репозитория:
 
 ```powershell
 notepad .\PROFILE
 ```
 
-Скопируйте всё содержимое и вставьте в `$PROFILE`.
+Скопируйте весь текст и вставьте его в открытый `$PROFILE`.
 
----
-
-### 5. Положите файлы рядом с профилем
+### 4. Положите файлы рядом с профилем
 
 Откройте папку профиля:
 
@@ -92,36 +92,50 @@ explorer (Split-Path $PROFILE)
 
 Скопируйте туда:
 
-```text
-PROFILE
-shell_S.omp.json
-startup.wav
-```
+- `shell_S.omp.json`
+- `startup.wav`
 
-Итог:
+После этого рядом с профилем должны лежать такие файлы:
 
 ```text
 Documents\PowerShell\
-├─ PROFILE
+├─ Microsoft.PowerShell_profile.ps1
 ├─ shell_S.omp.json
 └─ startup.wav
 ```
 
----
+### 5. Перезапустите PowerShell
 
-### 6. Перезапустите PowerShell
-
-или выполните:
+Либо примените профиль вручную:
 
 ```powershell
 . $PROFILE
 ```
 
-Готово.
+---
+
+## Отдельно для VS Code
+
+VS Code использует свой профиль PowerShell, поэтому для одинакового внешнего вида нужно создать отдельный файл-мостик.
+
+### Создайте файл `Microsoft.VSCode_profile.ps1`
+
+```powershell
+notepad $env:USERPROFILE\Documents\PowerShell\Microsoft.VSCode_profile.ps1
+```
+
+### Вставьте в него
+
+```powershell
+# Мостик к основному профилю shell_S
+. "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+```
+
+После этого терминал в VS Code будет использовать тот же профиль, что и обычный PowerShell.
 
 ---
 
-# Как это работает
+## Как это работает
 
 Профиль автоматически ищет файлы рядом с собой:
 
@@ -130,29 +144,22 @@ $ompConfig = Join-Path $PSScriptRoot "shell_S.omp.json"
 $soundPath = Join-Path $PSScriptRoot "startup.wav"
 ```
 
-Это значит:
+Это удобно, потому что:
 
-- можно открывать терминал из любой папки
-- тема всегда найдётся
-- звук всегда найдётся
-
-Без ручной правки путей.
-
----
-
-# Пропуск анимации
-
-Во время запуска нажмите:
-
-```text
-Space
-```
-
-Оставшаяся часть баннера появится мгновенно.
+- можно запускать PowerShell из любой папки
+- тема всегда находится автоматически
+- звук всегда находится автоматически
+- не нужно вручную редактировать пути
 
 ---
 
-# Звук запуска
+## Пропуск анимации
+
+Во время запуска нажмите **Space** — оставшаяся часть баннера появится сразу.
+
+---
+
+## Звук запуска
 
 По умолчанию используется:
 
@@ -160,75 +167,123 @@ Space
 startup.wav
 ```
 
-рядом с `PROFILE`.
+Файл должен лежать рядом с профилем.
 
----
-
-## Добавить свой звук
+### Добавить свой звук
 
 Поддерживается PCM WAV.
-
-Конвертация:
 
 ```powershell
 ffmpeg -i "my.mp3" -acodec pcm_s16le -ar 44100 "startup.wav"
 ```
 
-Положите файл рядом с профилем.
+Положите получившийся файл рядом с профилем.
+
+### Отключить звук
+
+Закомментируйте строку с путём к `startup.wav` в профиле.
 
 ---
 
-## Отключить звук
+## Частые ошибки и решения
 
-Закомментируйте строку:
+### 1. Ошибка темы Oh My Posh: `CONFIG PARSE ERROR`
+
+#### Симптомы
+
+- вместо минималистичного промпта `╭─` / `╰─` показывается стандартный powerline
+- в терминале появляется ошибка `CONFIG PARSE ERROR`
+
+#### Причина
+
+В файле `shell_S.omp.json` у сегмента `path` был лишний параметр `style` внутри `properties`.
+
+#### Неправильно
+
+```json
+{
+  "foreground": "#ff5555",
+  "style": "plain",
+  "properties": {
+    "style": "agnoster_short"
+  },
+  "template": "<#ffffff>[</>{{ .Path }}<#ffffff>]",
+  "type": "path"
+}
+```
+
+#### Правильно
+
+```json
+{
+  "foreground": "#ff5555",
+  "style": "plain",
+  "template": "<#ffffff>[</>{{ .Path }}<#ffffff>]",
+  "type": "path"
+}
+```
+
+После исправления перезапустите PowerShell.
+
+---
+
+### 2. В VS Code тема выглядит иначе
+
+#### Симптомы
+
+- другой промпт
+- нет анимации
+- нет звука
+- алиасы не работают так же, как в обычной консоли
+
+#### Причина
+
+VS Code использует отдельный профиль:
+
+```text
+Microsoft.VSCode_profile.ps1
+```
+
+#### Решение
+
+Создайте файл:
 
 ```powershell
-$soundPath = Join-Path $PSScriptRoot "startup.wav"
+notepad $env:USERPROFILE\Documents\PowerShell\Microsoft.VSCode_profile.ps1
+```
+
+И вставьте:
+
+```powershell
+# Мостик к основному профилю shell_S
+. "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 ```
 
 ---
 
-# Дополнительно
+## Дополнительно
 
-## Убрать баннер PowerShell
+### Убрать стандартный баннер PowerShell
 
-Windows Terminal → Settings → PowerShell → commandline
+В Windows Terminal откройте настройки профиля PowerShell и укажите:
 
 ```powershell
 pwsh.exe -NoLogo
 ```
 
----
+### Изменить скорость анимации
 
-## Скорость анимации
-
-Найдите:
+Найдите строку:
 
 ```powershell
 for ($w = 0; $w -lt 6000; $w++) { }
 ```
 
-Быстрее:
+- меньшее значение — быстрее
+- большее значение — медленнее
+- если удалить строку, запуск будет мгновенным
 
-```powershell
-3000
-```
-
-Медленнее:
-
-```powershell
-8000
-```
-
-Мгновенно:
-
-удалить строку.
-
----
-
-## Обновить репозиторий
-
-Если уже установлен:
+### Обновить репозиторий
 
 ```powershell
 cd shell_S
@@ -237,16 +292,17 @@ git pull
 
 ---
 
-# Файлы
+## Файлы
 
 | Файл | Назначение |
 |---|---|
-| `PROFILE` | PowerShell профиль |
+| `PROFILE` | основной профиль PowerShell |
+| `VS_CODE_PROFILE` | профиль для VS Code |
 | `shell_S.omp.json` | тема Oh My Posh |
 | `startup.wav` | звук запуска |
-| `start1.gif` | демонстрация |
-| `vs_code.png` | демонстрация vs_code|
+| `start.gif` | демонстрация запуска |
+| `vs_code.png` | демонстрация в VS Code |
 
 ---
 
-Сделано для PowerShell + Windows Terminal.
+Сделано для **PowerShell 7** + **Windows Terminal** + **VS Code**

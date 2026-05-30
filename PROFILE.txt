@@ -11,9 +11,6 @@
 #   - безопасное воспроизведение startup.wav
 # ============================================================
 
-# ============================================
-# Пути (файлы лежат рядом с PROFILE)
-# ============================================
 $ompConfig = Join-Path $PSScriptRoot "shell_S.omp.json"
 $soundPath = Join-Path $PSScriptRoot "startup.wav"
 
@@ -31,7 +28,6 @@ Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -BellStyle None
 Set-PSReadLineOption -Colors @{ InlinePrediction = '#555555' }
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
-
 $MaximumHistoryCount = 10000
 
 # ============================================
@@ -41,11 +37,8 @@ $function:ls = $function:dir = {
     if (-not (Get-Module -ListAvailable Terminal-Icons)) {
         return Get-ChildItem @args
     }
-
     Import-Module Terminal-Icons -ErrorAction SilentlyContinue
-
     Remove-Item Function:\ls, Function:\dir -Force
-
     Get-ChildItem @args
 }
 
@@ -53,20 +46,12 @@ $function:ls = $function:dir = {
 # 3. Oh My Posh — кэш
 # ============================================
 if (Test-Path $ompConfig) {
-
     $ompCache = "$env:TEMP\omp_prompt.ps1"
-
-    if (
-        -not (Test-Path $ompCache) -or
-        ((Get-Item $ompCache).LastWriteTime -lt (Get-Item $ompConfig).LastWriteTime)
-    ) {
-        oh-my-posh init pwsh --config $ompConfig |
-            Out-File $ompCache -Encoding utf8
+    if (-not (Test-Path $ompCache) -or ((Get-Item $ompCache).LastWriteTime -lt (Get-Item $ompConfig).LastWriteTime)) {
+        oh-my-posh init pwsh --config $ompConfig | Out-File $ompCache -Encoding utf8
     }
-
     . $ompCache
-}
-else {
+} else {
     Write-Warning "OMP config missing: $ompConfig"
 }
 
@@ -87,17 +72,8 @@ $loadMs = $profileLoadStopwatch.ElapsedMilliseconds
 # 6. Цветовой градиент
 # ============================================
 function Get-HeatGradientAnsi {
-    param(
-        [int]$X,
-        [int]$LineLength
-    )
-
-    $t = if ($LineLength -gt 1) {
-        $X / ($LineLength - 1)
-    }
-    else {
-        0
-    }
+    param([int]$X, [int]$LineLength)
+    $t = if ($LineLength -gt 1) { $X / ($LineLength - 1) } else { 0 }
 
     if ($t -lt 0.25) {
         $localT = $t / 0.25
@@ -123,7 +99,6 @@ function Get-HeatGradientAnsi {
         $g = 255
         $b = [math]::Floor(255 * $localT)
     }
-
     return "38;2;$r;$g;$b"
 }
 
@@ -131,9 +106,9 @@ function Get-HeatGradientAnsi {
 # 7. ASCII-арт
 # ============================================
 $hourglassLines = @(
-    "     .-.     ",
-    "    /   \         .-.     ",
-    "   /     \       /   \       .-.     .-.     _   _",
+    "      .-.     ",
+    "     /   \         .-.     ",
+    "    /     \       /   \       .-.     .-.     _   _",
     "+--/-------\-----/-----\-----/---\---/---\---/-\-/-\/\/---> $loadMs ms",
     "| /         \   /       \   /     '-'     '-'",
     "|/           '-'         '-'",
@@ -145,7 +120,6 @@ $hourglassLines = @(
 # 8. Звук запуска
 # ============================================
 $player = $null
-
 if ($soundPath -and (Test-Path $soundPath)) {
     try {
         $player = New-Object System.Media.SoundPlayer
@@ -162,80 +136,48 @@ if ($soundPath -and (Test-Path $soundPath)) {
 # 9. Анимация
 # ============================================
 try {
-
     $skipAnimation = $false
-
     foreach ($line in $hourglassLines) {
-
         $length = $line.Length
-
         for ($x = 0; $x -lt $length; $x++) {
-
             if (-not $skipAnimation -and [Console]::KeyAvailable) {
                 $key = [Console]::ReadKey($true)
-
                 if ($key.Key -eq 'Spacebar') {
                     $skipAnimation = $true
                 }
             }
-
             if ($skipAnimation) {
-
                 $sb = [System.Text.StringBuilder]::new()
-
                 for ($i = $x; $i -lt $length; $i++) {
                     $ansi = Get-HeatGradientAnsi -X $i -LineLength $length
                     [void]$sb.Append("`e[${ansi}m$($line[$i])`e[0m")
                 }
-
                 Write-Host $sb.ToString() -NoNewline
                 break
             }
-
             $ansi = Get-HeatGradientAnsi -X $x -LineLength $length
-
             Write-Host "`e[${ansi}m$($line[$x])`e[0m" -NoNewline
-
             for ($w = 0; $w -lt 6000; $w++) { }
         }
-
         Write-Host ""
-
         if ($skipAnimation) {
-
             $startIndex = $hourglassLines.IndexOf($line) + 1
-
             for ($y = $startIndex; $y -lt $hourglassLines.Count; $y++) {
-
                 $restLine = $hourglassLines[$y]
-
-                if ($restLine.Length -eq 0) {
-                    Write-Host ""
-                    continue
-                }
-
+                if ($restLine.Length -eq 0) { Write-Host ""; continue }
                 $sb = [System.Text.StringBuilder]::new()
-
                 for ($i = 0; $i -lt $restLine.Length; $i++) {
                     $ansi = Get-HeatGradientAnsi -X $i -LineLength $restLine.Length
                     [void]$sb.Append("`e[${ansi}m$($restLine[$i])`e[0m")
                 }
-
                 Write-Host $sb.ToString()
             }
-
             break
         }
     }
 }
 finally {
-
     if ($player) {
-        try {
-            $player.Stop()
-            $player.Dispose()
-        }
-        catch {
-        }
+        try { $player.Stop(); $player.Dispose() } catch { }
     }
 }

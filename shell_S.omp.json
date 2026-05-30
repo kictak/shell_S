@@ -1,5 +1,4 @@
 ﻿{
-  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "version": 4,
   "blocks": [
     {
@@ -13,9 +12,6 @@
         {
           "foreground": "#ff5555",
           "style": "plain",
-          "properties": {
-            "style": "agnoster_short"
-          },
           "template": "<#ffffff>[</>{{ .Path }}<#ffffff>]",
           "type": "path"
         },
@@ -56,13 +52,13 @@
             "fetch_upstream_icon": false
           },
           "style": "plain",
-          "template": "<#ffffff>[</>{{ .HEAD }}{{ if .Staging.Changed }} <#00AA00>\u25cf {{ .Staging.String }}</>{{ end }}{{ if .Working.Changed }} <#D75F00>\u25cf {{ .Working.String }}</>{{ end }}<#ffffff>]-",
+          "template": "<#ffffff>[</>{{ .HEAD }}{{ if .Staging.Changed }} <#00AA00>\u25cf {{ .Staging.String }}</>{{ end }}{{ if .Working.Changed }} <#D75F00>\u25cf {{ .Working.String }}</>{{ end }}<#ffffff>]",
           "type": "git"
         },
         {
           "foreground": "#ecf7fa",
           "style": "plain",
-          "template": "{{ if gt .Code 0 }}✖ {{ .Code }}{{ else }}❯{{ end }}",
+          "template": "\ue285",
           "type": "status"
         }
       ],
